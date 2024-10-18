@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "test-whisper"
+version = "0.1.0"
+description = ""
+authors = ["Jorge Castro <jorge.castro@adevinta.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+moviepy = "^1.0.3"
+eyed3 = "^0.9.7"
+pydub = "^0.25.1"
+groq = "^0.11.0"
+boto3 = "^1.35.43"
+gtts = "^2.5.3"
+
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
