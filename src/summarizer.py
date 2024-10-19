@@ -4,6 +4,7 @@ import subprocess
 import re
 import tempfile
 import uuid
+import argparse
 import moviepy.editor as mp
 from groq import Groq
 from bedrock_client import BedrockClient
@@ -12,41 +13,61 @@ from pytubefix import YouTube
 
 class Summarizer:
 
-    def __init__(self, filename: str, context: str, audio_language: str, summary_language: str):
+    def __init__(self):
         self.tmp_folder = 'src/tmp/'
-        self.filename = filename
-        self.context = context
-        self.audio_language = audio_language  # 'en' https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes
-        self.summary_language = summary_language
+        self.model_id = "anthropic.claude-3-haiku-20240307-v1:0"
+        # self.model_id = "anthropic.claude-3-sonnet-20240229-v1:0"
+        # self.model_id = "anthropic.claude-3-5-sonnet-20240620-v1:0"
 
-    def summarize(self):
-        file_type = self.__get_file_type(self.filename)
+
+    def summarize(self, filename: str, context: str, audio_language: str, summary_language: str):
+        file_type = self.__get_file_type(filename)
         if file_type == "Video":
-            audio_file = self.__extract_audio_from_video(self.filename)
+            audio_file = self.__extract_audio_from_video(filename)
         elif file_type == "YouTube":
-            audio_file = self.__extract_audio_from_youtube(self.filename)
+            audio_file = self.__extract_audio_from_youtube(filename)
         elif file_type == "Audio":
-            audio_file = self.filename
+            audio_file = filename
         else:
             sys.exit(
                 """Formato de archivo no soportado. Solo soportamos: 
                 - URLs de Youtube
                 - Audio: mp3, wav, aac, flac, ogg, m4a
                 - Video: mp4, mkv, avi, mov, wmv, flv
-                - Ficheros de texto: txt, csv
                      """
             )
 
         audio_file_compressed = self.__compress_audio(audio_file)
         self.__check_audio_file_size(audio_file_compressed)
-        transcription = self.__transcript_audio(
+        transcription_file = self.__transcript_audio(
             audio_file_compressed,
-            self.context,
-            self.audio_language,
+            context,
+            audio_language,
         )
-        summary = self.__call_llm(transcription, self.summary_language)
-        self.__clean_tmp(self.tmp_folder)
+        summary = self.summarize_with_llm(transcription_file, summary_language)
         return summary
+
+    def ask_things(self, transcription_file: str, summary_language: str) -> str:
+        bedrock_client = BedrockClient()
+
+        with open(transcription_file, "r", encoding="utf-8") as file:
+            transcript = file.read()
+
+        SUMARIZATION_PROMPT = f"""You are responsible for answering questions accurately from the <transcript>.
+
+        <transcript>
+        {transcript}
+        </transcript>
+
+        Write the answer in {summary_language}
+
+        Don't hallucinate. Don't make up truthful information.
+        """
+
+        completion = bedrock_client.invoke_model(self.model_id, system_prompt="", user_prompt=SUMARIZATION_PROMPT)
+
+        response_text = completion.get("content")[0]["text"]
+        return response_text
 
     def __extract_audio_from_video(self, filename_input: str) -> str:
         with tempfile.NamedTemporaryFile(suffix=".mp3", dir=self.tmp_folder, delete=False) as temp_file:
@@ -72,6 +93,9 @@ class Summarizer:
             output_filename = temp_file.name
             command = [
                 "ffmpeg",
+                "-hide_banner",
+                "-loglevel",
+                "error",
                 "-i",
                 file_name_mp3,
                 "-ar",
@@ -112,14 +136,19 @@ class Summarizer:
                 language=audio_language,
                 temperature=0.0,
             )
-            print(transcription.text)
-        return transcription.text
 
-    def __call_llm(self, transcript: str, summary_language: str) -> str:
-        MODEL_ID = "anthropic.claude-3-haiku-20240307-v1:0"
-        # MODEL_ID = "anthropic.claude-3-sonnet-20240229-v1:0"
-        # MODEL_ID = "anthropic.claude-3-5-sonnet-20240620-v1:0"
+        with tempfile.NamedTemporaryFile(delete=False, dir=self.tmp_folder, suffix=".txt", mode="w", encoding="utf-8") as temp_file:
+            temp_file.write(transcription.text)
+            temp_file_name = temp_file.name
+
+        print(f"Transcripción guardada en: {temp_file_name}")
+        return temp_file_name
+
+    def summarize_with_llm(self, transcript_file_name: str, summary_language: str) -> str:
         bedrock_client = BedrockClient()
+
+        with open(transcript_file_name, "r", encoding="utf-8") as file:
+            transcript = file.read()
 
         SUMARIZATION_PROMPT = f"""You are responsible for accurately summarizing the meeting <transcript>.
 
@@ -140,10 +169,9 @@ class Summarizer:
         Don't hallucinate. Don't make up truthful information.
         """
 
-        completion = bedrock_client.invoke_model(MODEL_ID, system_prompt="", user_prompt=SUMARIZATION_PROMPT)
+        completion = bedrock_client.invoke_model(self.model_id, system_prompt="", user_prompt=SUMARIZATION_PROMPT)
 
         response_text = completion.get("content")[0]["text"]
-        print(response_text)
         return response_text
 
     def __get_file_type(self, string: str) -> str:
@@ -160,16 +188,19 @@ class Summarizer:
         else:
             return "Otros"
 
-    def __clean_tmp(self, folder_path: str):
-        for filename in os.listdir(folder_path):
-            file_path = os.path.join(folder_path, filename)
-            if os.path.isfile(file_path):
-                if filename.lower().endswith(('.mp3', '.txt')):
-                    os.remove(file_path)
-                    print(f"Deleted: {filename}")
+
+def main():
+    parser = argparse.ArgumentParser(description="Summarizer CLI")
+    parser.add_argument("--url", type=str, required=True, help="URL del contenido a resumir")
+    parser.add_argument("--context", type=str, required=False, help="Contexto adicional para la transcripción")
+    parser.add_argument("--language", type=str, required=False, default='es', help="Idioma del contenido")
+    parser.add_argument("--summary_language", type=str, required=False, default='Spanish', help="Idioma del resumen")
+
+    args = parser.parse_args()
+
+    summarizer = Summarizer()
+    print(summarizer.summarize(args.url, args.context, args.language, args.summary_language))
 
 
-# https://www.youtube.com/watch?v=7iiE-cE03So
-# video_youtube.mp4
-summarizer = Summarizer('pepeti.gggg', 'reglas del virus', 'es', 'Spanish')
-print(summarizer.summarize())
+if __name__ == "__main__":
+    main()
