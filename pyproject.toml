@@ -6,18 +6,24 @@ authors = ["Jorge Castro <jorge.castro@adevinta.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.11"
 moviepy = "^1.0.3"
 eyed3 = "^0.9.7"
 pydub = "^0.25.1"
 groq = "^0.11.0"
 boto3 = "^1.35.43"
 gtts = "^2.5.3"
+pytubefix = "^8.1.1"
 
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.4"
+black = "^24.10.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 140
+skip-string-normalization = true

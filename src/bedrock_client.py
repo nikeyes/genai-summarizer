@@ -7,10 +7,7 @@ class BedrockClient:
     client: boto3.client = None
 
     def __init__(self):
-        unicron_notebooks = os.getenv('UNICRON_NOTEBOOKS')
-
-        if unicron_notebooks is None:
-            boto3.setup_default_session(profile_name='genai-dev')
+        boto3.setup_default_session(profile_name='genai-dev')
 
         aws_region_paris = 'eu-west-3'
         aws_region_frankfurt = 'eu-central-1'
