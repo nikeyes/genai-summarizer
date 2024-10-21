@@ -1,14 +1,21 @@
+import pytest
 from unittest import TestCase
 from assertpy import assert_that
 
 from transcription_extractor import TranscriptionExtractor
-from src.cleaner import Cleaner
+from cleaner import Cleaner
 
 
 class TestExtractTranscription(TestCase):
     def tearDown(self) -> None:
         Cleaner()
         return super().tearDown()
+
+    def test_extract_unsupported_file_type(self):
+        transcription_extractor = TranscriptionExtractor()
+        with pytest.raises(Exception) as excinfo:
+            transcription_extractor.extract("unsupported_file.xyz", "context", "en")
+        assert "Formato de archivo no soportado" in str(excinfo.value)
 
     def test_extract_transcription_from_youtube_video_that_has_not_transcription(self):
         transcription_extractor = TranscriptionExtractor()
