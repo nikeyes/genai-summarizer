@@ -189,8 +189,8 @@ def main():
 
     args = parser.parse_args()
 
-    info_extractor = TranscriptionExtractor()
-    info_extractor.extract(args.url, args.context, args.language)
+    transcription_extractor = TranscriptionExtractor()
+    transcription_extractor.extract(args.url, args.context, args.language)
 
 
 if __name__ == "__main__":

@@ -11,8 +11,8 @@ class TestExtractTranscription(TestCase):
         return super().tearDown()
 
     def test_extract_transcription_from_youtube_video_that_has_not_transcription(self):
-        info_extractor = TranscriptionExtractor()
-        transcription_file, transcription_text = info_extractor.extract(
+        transcription_extractor = TranscriptionExtractor()
+        transcription_file, transcription_text = transcription_extractor.extract(
             filename='https://www.youtube.com/shorts/MwjXxiE9Vh8',
             context='INTELIGENCIA ARTIFICIAL para Mejorar la Ortografía con ChatGPT 🤖 Técnicas para primaria y secundaria',
             audio_language='es',
@@ -25,8 +25,8 @@ class TestExtractTranscription(TestCase):
         )
 
     def test_extract_transcription_from_youtube_video_with_native_transcription(self):
-        info_extractor = TranscriptionExtractor()
-        transcription_file, transcription_text = info_extractor.extract(
+        transcription_extractor = TranscriptionExtractor()
+        transcription_file, transcription_text = transcription_extractor.extract(
             filename='https://www.youtube.com/watch?v=VTt36VLHmT0',
             context='Necesitamos PATROCINADORES y PARTNERS para seguir AYUDANDO en STEM | ValPat',
             audio_language='es',
@@ -39,8 +39,8 @@ class TestExtractTranscription(TestCase):
         )
 
     def test_extract_transcription_from_local_video(self):
-        info_extractor = TranscriptionExtractor()
-        transcription_file, transcription_text = info_extractor.extract(
+        transcription_extractor = TranscriptionExtractor()
+        transcription_file, transcription_text = transcription_extractor.extract(
             filename='tests/integration_tests/valpat_for_test.mp4',
             context='INTELIGENCIA ARTIFICIAL para Mejorar la Ortografía con ChatGPT 🤖 Técnicas para primaria y secundaria',
             audio_language='es',
@@ -53,8 +53,8 @@ class TestExtractTranscription(TestCase):
         )
 
     def test_extract_transcription_from_local_audio(self):
-        info_extractor = TranscriptionExtractor()
-        transcription_file, transcription_text = info_extractor.extract(
+        transcription_extractor = TranscriptionExtractor()
+        transcription_file, transcription_text = transcription_extractor.extract(
             filename='tests/integration_tests/valpat_for_test.mp3',
             context='INTELIGENCIA ARTIFICIAL para Mejorar la Ortografía con ChatGPT 🤖 Técnicas para primaria y secundaria',
             audio_language='es',

@@ -4,7 +4,7 @@ Resume tus videos, audios o documentos
 
 # PoC - sample
 ```bash
-poetry run python src/info_extractor.py --url https://www.youtube.com/watch\?v\=w3Q-_i6KSH4
+poetry run python src/transcription_extractor.py --url https://www.youtube.com/watch\?v\=w3Q-_i6KSH4
 
 poetry run python src/summarizer.py 
 
