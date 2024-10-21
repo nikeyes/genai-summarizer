@@ -1,7 +1,7 @@
 import os
 
 
-class cleaner:
+class Cleaner:
     def __init__(self):
         tmp_folder = 'src/tmp/'
         self.__clean_tmp(tmp_folder)
@@ -14,5 +14,5 @@ class cleaner:
                     os.remove(file_path)
                     print(f"Deleted: {filename}")
 
-
-cleaner()
+if __name__ == "__main__":
+    Cleaner()

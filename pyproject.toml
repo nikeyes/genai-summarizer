@@ -14,11 +14,29 @@ groq = "^0.11.0"
 boto3 = "^1.35.43"
 gtts = "^2.5.3"
 pytubefix = "^8.1.1"
+youtube-transcript-api = "^0.6.2"
 
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.4"
 black = "^24.10.0"
+pytest = "^8.3.3"
+pytest-cov = "^5.0.0"
+assertpy = "^1.1"
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+    "tests/integration_tests",
+    "tests/unit_tests",
+    "tests/approval_tests"
+]
+pythonpath = [
+    "src"
+]
+python_files = ["test_*.py", "*_test.py", "*_should.py", ]
+python_classes = ["Test", "Acceptance", "Given"]
+python_functions = ["test", "*_test", "when_*", "then_*"]
 
 [build-system]
 requires = ["poetry-core"]

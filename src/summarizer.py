@@ -1,14 +1,5 @@
-import os
-import sys
-import subprocess
-import re
-import tempfile
-import uuid
 import argparse
-import moviepy.editor as mp
-from groq import Groq
 from bedrock_client import BedrockClient
-from pytubefix import YouTube
 
 
 class Summarizer:
@@ -56,7 +47,9 @@ class Summarizer:
 
 def main():
     parser = argparse.ArgumentParser(description="Summarizer CLI")
-    parser.add_argument("--transcription", type=str, required=True, help="Ruta al fichero de la transcripción")
+    parser.add_argument(
+        "--transcription", type=str, required=False, default='src/tmp/transcription.txt', help="Ruta al fichero de la transcripción"
+    )
     parser.add_argument("--summary_language", type=str, required=False, default='Spanish', help="Idioma del resumen")
 
     args = parser.parse_args()

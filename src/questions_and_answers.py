@@ -83,7 +83,9 @@ class QuestionsAndAnswers:
 
 def main():
     parser = argparse.ArgumentParser(description="Questions And Answers CLI")
-    parser.add_argument("--transcription", type=str, required=True, help="Ruta al fichero de la transcripción")
+    parser.add_argument(
+        "--transcription", type=str, required=False, default='src/tmp/transcription.txt', help="Ruta al fichero de la transcripción"
+    )
     parser.add_argument("--question", type=str, required=True, help="Idioma de las respuestas")
     parser.add_argument("--response_language", type=str, required=False, default='Spanish', help="Idioma de las respuestas")
 

@@ -2,13 +2,13 @@
 Resume tus videos, audios o documentos
 
 
-# PoC
+# PoC - sample
 ```bash
 poetry run python src/info_extractor.py --url https://www.youtube.com/watch\?v\=w3Q-_i6KSH4
 
-poetry run python src/summarizer.py --transcription /Users/jorge.castro/mordor/personal/genai-summarizer/src/tmp/tmpdvpe63bg.txt
+poetry run python src/summarizer.py 
 
-poetry run python src/questions_and_answers.py --transcription /Users/jorge.castro/mordor/personal/genai-summarizer/src/tmp/tmpq9onuqty.txt --question "Crea una lista con los juegos"
+poetry run python src/questions_and_answers.py --question "Crea una lista con los juegos."
 
 poetry run python src/cleaner.py 
 ```
