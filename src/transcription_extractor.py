@@ -141,6 +141,13 @@ class TranscriptionExtractor:
 
         return "Otros"
 
+    def get_transcription_file_name(self,url_or_filename):
+        if self.__get_file_type(url_or_filename) == "YouTube":
+            filename = self.__extract_video_id_from_youtube_url(url_or_filename)
+        else:
+            filename = os.path.splitext(os.path.basename(url_or_filename))[0]
+        return filename
+
     def __extract_video_id_from_youtube_url(self, url: str) -> str:
 
         parsed_url = urlparse(url)

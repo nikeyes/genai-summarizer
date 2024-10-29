@@ -1,5 +1,5 @@
-import pytest
 from unittest import TestCase
+import pytest
 from assertpy import assert_that
 
 from transcription_extractor import TranscriptionExtractor
