@@ -20,17 +20,18 @@ class TranscriptionExtractor:
 
     def extract(self, filename: str, context: str, audio_language: str) -> tuple[str, str]:
         file_type = self.__get_file_type(filename)
+        output_filename = self.get_transcription_file_name(filename)
         if file_type == "Video":
             audio_file = self.__extract_audio_from_video(filename)
-            transcription_file, transcription_text = self.__get_transcription_from_audio(audio_file, context, audio_language)
+            transcription_text = self.__get_transcription_from_audio(audio_file, context, audio_language, output_filename)
         elif file_type == "YouTube":
-            transcription_file, transcription_text = self.__get_transcript_from_youtube_video(filename, audio_language)
-            if transcription_file is None:
+            transcription_text = self.__get_transcript_from_youtube_video(filename, audio_language, output_filename)
+            if transcription_text is None:
                 audio_file = self.__extract_audio_from_youtube(filename)
-                transcription_file, transcription_text = self.__get_transcription_from_audio(audio_file, context, audio_language)
+                transcription_text = self.__get_transcription_from_audio(audio_file, context, audio_language, output_filename)
         elif file_type == "Audio":
             audio_file = filename
-            transcription_file, transcription_text = self.__get_transcription_from_audio(audio_file, context, audio_language)
+            transcription_text = self.__get_transcription_from_audio(audio_file, context, audio_language, output_filename)
         else:
             raise Exception(
                 """
@@ -40,19 +41,20 @@ class TranscriptionExtractor:
                 - Video: mp4, mkv, avi, mov, wmv, flv
                 """
             )
-        return transcription_file, transcription_text
+        return output_filename, transcription_text
 
-    def __get_transcription_from_audio(self, audio_file, context, audio_language) -> tuple[str, str]:
-        audio_file_compressed = self.__compress_audio(audio_file)
+    def __get_transcription_from_audio(self, audio_file, context, audio_language, output_filename) -> str:
+        audio_file_compressed = self.__compress_audio(audio_file)        
         print(f"Audio guardado en: {audio_file_compressed}")
         self.__check_audio_file_size(audio_file_compressed)
-        transcription_file, transcription_text = self.__transcript_audio(
+        transcription_text = self.__transcript_audio(
             audio_file_compressed,
             context,
             audio_language,
+            output_filename
         )
-        print(f"Transcripción guardada en: {transcription_file}")
-        return transcription_file, transcription_text
+        print(f"Transcripción guardada en: {output_filename}")
+        return transcription_text
 
     def __extract_audio_from_video(self, filename_input: str) -> str:
         with tempfile.NamedTemporaryFile(suffix=".mp3", dir=self.tmp_folder, delete=False) as temp_file:
@@ -106,7 +108,7 @@ class TranscriptionExtractor:
             print(f"El fichero {file_name_compress_mp3} es más grande de 25MB ({file_size_mb}MB).")
             raise Exception("Tamaño máximo del fichero 25MB")
 
-    def __transcript_audio(self, file_name_compress_mp3: str, context: str, audio_language: str) -> tuple[str, str]:
+    def __transcript_audio(self, file_name_compress_mp3: str, context: str, audio_language: str, output_filename: str) -> str:
 
         client = Groq()
         filename = file_name_compress_mp3
@@ -121,11 +123,10 @@ class TranscriptionExtractor:
                 temperature=0.0,
             )
 
-        transcription_file = os.path.join(self.tmp_folder, "transcription.txt")
-        with open(transcription_file, mode="w", encoding="utf-8") as temp_file:
+        with open(output_filename, mode="w", encoding="utf-8") as temp_file:
             temp_file.write(transcription.text)
 
-        return transcription_file, transcription.text
+        return transcription.text
 
     def __get_file_type(self, string: str) -> str:
         youtube_pattern = re.compile(r'(https?://)?(www.)?(youtube|youtu.be)(.com)?/.*')
@@ -145,8 +146,9 @@ class TranscriptionExtractor:
         if self.__get_file_type(url_or_filename) == "YouTube":
             filename = self.__extract_video_id_from_youtube_url(url_or_filename)
         else:
-            filename = os.path.splitext(os.path.basename(url_or_filename))[0]
-        return filename
+            filename = os.path.basename(url_or_filename)
+        filename_with_path = os.path.join(self.tmp_folder, filename + ".txt")
+        return filename_with_path
 
     def __extract_video_id_from_youtube_url(self, url: str) -> str:
 
@@ -169,11 +171,14 @@ class TranscriptionExtractor:
             elif parsed_url.path.startswith('/v/'):
                 # Para URLs de tipo youtube.com/v/VIDEO_ID
                 return parsed_url.path.split('/')[2]
+            elif parsed_url.path.startswith('/shorts/'):
+                # Para URLs de tipo youtube.com/shorts/VIDEO_ID
+                return parsed_url.path.split('/')[2]
 
         # Si no se pudo extraer el ID, devolver None
         return None
 
-    def __get_transcript_from_youtube_video(self, url: str, language: str) -> tuple[str, str]:
+    def __get_transcript_from_youtube_video(self, url: str, language: str, output_filename: str) -> str:
         video_id = self.__extract_video_id_from_youtube_url(url)
         if video_id is None:
             return None, None
@@ -182,10 +187,11 @@ class TranscriptionExtractor:
         formatter = TextFormatter()
 
         text_transcript = formatter.format_transcript(transcript)
-        transcription_file = os.path.join(self.tmp_folder, "transcription.txt")
-        with open(transcription_file, mode="w", encoding="utf-8") as temp_file:
+
+        with open(output_filename, mode="w", encoding="utf-8") as temp_file:
             temp_file.write(text_transcript)
-        return transcription_file, text_transcript
+
+        return text_transcript
 
 
 def main():
