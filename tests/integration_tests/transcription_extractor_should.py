@@ -2,8 +2,8 @@ from unittest import TestCase
 import pytest
 from assertpy import assert_that
 
-from src.transcription_extractor import TranscriptionExtractor
-from src.cleaner import Cleaner
+from transcription_extractor import TranscriptionExtractor
+from cleaner import Cleaner
 
 
 class TestExtractTranscription(TestCase):

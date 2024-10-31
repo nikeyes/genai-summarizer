@@ -1,6 +1,6 @@
 from unittest import TestCase
 import pytest
-from src.transcription_extractor import TranscriptionExtractor
+from transcription_extractor import TranscriptionExtractor
 
 class TestTranscriptionExtractor(TestCase):
     def test_get_transcription_file_name_youtube_watch(self):

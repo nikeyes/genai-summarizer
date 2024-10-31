@@ -1,7 +1,6 @@
 import os
 import click
 from typing import Optional
-from pathlib import Path
 import subprocess
 import re
 import tempfile
@@ -151,7 +150,7 @@ class TranscriptionExtractor:
             filename = self.__extract_video_id_from_youtube_url(url_or_filename)
         else:
             filename = os.path.basename(url_or_filename)
-        filename_with_path = Path.joinpath(self.tmp_folder, filename + ".txt")
+        filename_with_path = os.path.join(self.tmp_folder, filename + ".txt")
         return filename_with_path
 
     def __extract_video_id_from_youtube_url(self, url: str) -> str:
