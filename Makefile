@@ -1,4 +1,4 @@
-TRANSCRIPT_FILE = src/tmp/meeting-minutes.txt
+TRANSCRIPT_FILE = src/_tmp/meeting-minutes.txt
 
 .PHONY: test
 test:	
@@ -6,16 +6,16 @@ test:
 
 .PHONY: meeting-minutes
 meeting-minutes: transcribe
-	@ poetry run python src/summarizer.py --transcription $(TRANSCRIPT_FILE)
+	@ poetry run python src/main_meeting_minutes.py --transcription $(TRANSCRIPT_FILE)
 
-.PHONY:ask
+.PHONY: ask
 ask: transcribe
-	@ poetry run python src/questions_and_answers.py --transcription $(TRANSCRIPT_FILE) --question "$(Q)"
+	@ poetry run python src/main_questions.py --transcription $(TRANSCRIPT_FILE) --question "$(Q)"
 
 .PHONY: transcribe
 transcribe:
-	@ [ -f $(TRANSCRIPT_FILE) ] || poetry run python src/transcription_extractor.py --url $(URL) --output-filename $(TRANSCRIPT_FILE)
+	@ [ -f $(TRANSCRIPT_FILE) ] || poetry run python src/main_transcription.py --url $(URL) --output-filename $(TRANSCRIPT_FILE)
 
 .PHONY: clean
 clean:
-	@ poetry run python src/cleaner.py
+	@ poetry run python src/main_cleaner.py

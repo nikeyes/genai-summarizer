@@ -163,5 +163,6 @@ cython_debug/
 
 files/
 src/tmp/
+src/_tmp/
 *.mp4
 *.mp3

@@ -1,6 +1,4 @@
 import os
-import click
-from typing import Optional
 import subprocess
 import re
 import tempfile
@@ -16,7 +14,7 @@ from youtube_transcript_api.formatters import TextFormatter
 class TranscriptionExtractor:
 
     def __init__(self):
-        self.tmp_folder = 'src/tmp/'
+        self.tmp_folder = 'src/_tmp/'
 
     def extract(self, filename: str, context: str, audio_language: str, output_filename: str = None) -> tuple[str, str]:
         file_type = self.__get_file_type(filename)
@@ -195,17 +193,3 @@ class TranscriptionExtractor:
             temp_file.write(text_transcript)
 
         return text_transcript
-
-
-@click.command()
-@click.option("--url", type=str, required=True, help="URL del contenido a resumir")
-@click.option("--context", type=str, required=False, help="Contexto adicional para la transcripción")
-@click.option("--language", type=str, required=False, default='es', help="Idioma del contenido")
-@click.option("--output-filename", type=str, required=False, default='', help="Fichero con la transcripción")
-def main(url: str, context: Optional[str], language: str, output_filename: Optional[str]) -> None:
-    """ CLI para resumir contenido en una URL """
-    transcription_extractor = TranscriptionExtractor()
-    transcription_extractor.extract(url, context, language, output_filename)
-
-if __name__ == "__main__":
-    main()

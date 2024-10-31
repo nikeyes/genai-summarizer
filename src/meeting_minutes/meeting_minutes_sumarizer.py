@@ -1,11 +1,10 @@
-import argparse
-from bedrock_client import BedrockClient
+from helpers.bedrock_client import BedrockClient
 
 
 class Summarizer:
 
     def __init__(self):
-        self.tmp_folder = 'src/tmp/'
+        self.tmp_folder = 'src/_tmp/'
         self.model_id = "anthropic.claude-3-haiku-20240307-v1:0"
         # self.model_id = "anthropic.claude-3-sonnet-20240229-v1:0"
         # self.model_id = "anthropic.claude-3-5-sonnet-20240620-v1:0"
@@ -44,19 +43,3 @@ class Summarizer:
         response_text = completion.get("content")[0]["text"]
         return response_text
 
-
-def main():
-    parser = argparse.ArgumentParser(description="Summarizer CLI")
-    parser.add_argument(
-        "--transcription", type=str, required=False, default='src/tmp/transcription.txt', help="Ruta al fichero de la transcripción"
-    )
-    parser.add_argument("--summary_language", type=str, required=False, default='Spanish', help="Idioma del resumen")
-
-    args = parser.parse_args()
-
-    summarizer = Summarizer()
-    print(summarizer.summarize(args.transcription, args.summary_language))
-
-
-if __name__ == "__main__":
-    main()

@@ -4,13 +4,11 @@ Resume tus videos, audios o documentos
 
 # PoC - Ejemplo para resumir tus video o hacer preguntas sobre su contenido
 ```bash
-poetry run python src/transcription_extractor.py --url https://www.youtube.com/watch\?v\=w3Q-_i6KSH4
+make meeting-minutes URL=https://www.youtube.com/watch\?v\=w3Q-_i6KSH4
 
-poetry run python src/summarizer.py 
+make ask Q="Crea una lista con los juegos."
 
-poetry run python src/questions_and_answers.py --question "Crea una lista con los juegos."
-
-poetry run python src/cleaner.py 
+make clean
 ```
 # Pendiente
 - Pendiente de añadir logging
