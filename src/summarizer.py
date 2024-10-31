@@ -20,7 +20,7 @@ class Summarizer:
         with open(transcript_file_name, "r", encoding="utf-8") as file:
             transcript = file.read()
 
-        SUMARIZATION_PROMPT = f"""You are responsible for accurately summarizing the meeting <transcript>.
+        SUMMARIZATION_PROMPT = f"""You are responsible for accurately summarizing the meeting <transcript>.
 
         <transcript>
         {transcript}
@@ -39,7 +39,7 @@ class Summarizer:
         Don't hallucinate. Don't make up truthful information.
         """
 
-        completion = bedrock_client.invoke_model(self.model_id, system_prompt="", user_prompt=SUMARIZATION_PROMPT)
+        completion = bedrock_client.invoke_model(self.model_id, system_prompt="", user_prompt=SUMMARIZATION_PROMPT)
 
         response_text = completion.get("content")[0]["text"]
         return response_text

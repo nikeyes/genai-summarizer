@@ -1,10 +1,11 @@
 import os
-import sys
+import click
+from typing import Optional
+from pathlib import Path
 import subprocess
 import re
 import tempfile
 import uuid
-import argparse
 from urllib.parse import urlparse, parse_qs
 import moviepy.editor as mp
 from groq import Groq
@@ -18,9 +19,12 @@ class TranscriptionExtractor:
     def __init__(self):
         self.tmp_folder = 'src/tmp/'
 
-    def extract(self, filename: str, context: str, audio_language: str) -> tuple[str, str]:
+    def extract(self, filename: str, context: str, audio_language: str, output_filename: str = None) -> tuple[str, str]:
         file_type = self.__get_file_type(filename)
-        output_filename = self.get_transcription_file_name(filename)
+
+        if output_filename is None or output_filename == "":
+            output_filename = self.get_transcription_file_name(filename)
+
         if file_type == "Video":
             audio_file = self.__extract_audio_from_video(filename)
             transcription_text = self.__get_transcription_from_audio(audio_file, context, audio_language, output_filename)
@@ -147,7 +151,7 @@ class TranscriptionExtractor:
             filename = self.__extract_video_id_from_youtube_url(url_or_filename)
         else:
             filename = os.path.basename(url_or_filename)
-        filename_with_path = os.path.join(self.tmp_folder, filename + ".txt")
+        filename_with_path = Path.joinpath(self.tmp_folder, filename + ".txt")
         return filename_with_path
 
     def __extract_video_id_from_youtube_url(self, url: str) -> str:
@@ -194,17 +198,15 @@ class TranscriptionExtractor:
         return text_transcript
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Summarizer CLI")
-    parser.add_argument("--url", type=str, required=True, help="URL del contenido a resumir")
-    parser.add_argument("--context", type=str, required=False, help="Contexto adicional para la transcripción")
-    parser.add_argument("--language", type=str, required=False, default='es', help="Idioma del contenido")
-
-    args = parser.parse_args()
-
+@click.command()
+@click.option("--url", type=str, required=True, help="URL del contenido a resumir")
+@click.option("--context", type=str, required=False, help="Contexto adicional para la transcripción")
+@click.option("--language", type=str, required=False, default='es', help="Idioma del contenido")
+@click.option("--output-filename", type=str, required=False, default='', help="Fichero con la transcripción")
+def main(url: str, context: Optional[str], language: str, output_filename: Optional[str]) -> None:
+    """ CLI para resumir contenido en una URL """
     transcription_extractor = TranscriptionExtractor()
-    transcription_extractor.extract(args.url, args.context, args.language)
-
+    transcription_extractor.extract(url, context, language, output_filename)
 
 if __name__ == "__main__":
     main()

@@ -72,3 +72,15 @@ class TestExtractTranscription(TestCase):
         assert_that(transcription_text).is_equal_to(
             ' ¿Te sientes perdido cuando tienes que ayudar a tu hijo o hija con sus deberes? No te preocupes, la inteligencia artificial está aquí para echarte una mano Hoy te enseñamos como usar ChatGPT para ayudar a todas las asignaturas que más gusten en casa como inglés o matemáticas No hace falta ser un experto para ayudarles a aprender Por ejemplo, si necesita apoyo con fracciones equivalentes en cuarto de primaria solo tienes que pedirle a ChatGPT que te genere ejercicios adaptados Además, mira cómo puedes ayudarle a mejorar con los fallos que tenga Corrígeme este ejercicio Le pedimos que nos corrija estos ejercicios en inglés y después que prepara actividades para mejorar los fallos que haya tenido Cada ejercicio se adapta a lo que necesites, ya sea gramática, cálculo o lo que se te ocurra Tú eliges el nivel y la disciplina'
         )
+
+    def test_extract_transcription_from_local_audio_with_output_name(self):
+        transcription_extractor = TranscriptionExtractor()
+        transcription_file, transcription_text = transcription_extractor.extract(
+            filename='tests/integration_tests/valpat_for_test.mp3',
+            context='INTELIGENCIA ARTIFICIAL para Mejorar la Ortografía con ChatGPT 🤖 Técnicas para primaria y secundaria',
+            audio_language='es',
+            output_filename='src/tmp/valpat_for_test_transcription.txt',
+        )
+
+        assert_that(transcription_file).is_equal_to('src/tmp/valpat_for_test_transcription.txt')
+        assert_that(transcription_file).exists()
