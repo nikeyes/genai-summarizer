@@ -1,13 +1,12 @@
 from helpers.bedrock_client import BedrockClient
+from helpers.config import TMP_FOLDER, MODEL_ID
 
 
 class Summarizer:
 
     def __init__(self):
-        self.tmp_folder = 'src/_tmp/'
-        self.model_id = "anthropic.claude-3-haiku-20240307-v1:0"
-        # self.model_id = "anthropic.claude-3-sonnet-20240229-v1:0"
-        # self.model_id = "anthropic.claude-3-5-sonnet-20240620-v1:0"
+        self.tmp_folder = TMP_FOLDER
+        self.model_id = MODEL_ID
 
     def summarize(self, transcription_file: str, summary_language: str):
         summary = self.summarize_with_llm(transcription_file, summary_language)
@@ -19,7 +18,7 @@ class Summarizer:
         with open(transcript_file_name, "r", encoding="utf-8") as file:
             transcript = file.read()
 
-        SUMMARIZATION_PROMPT = f"""You are responsible for accurately summarizing the meeting <transcript>.
+        MEETING_MINUTES_PROMPT = f"""You are responsible for accurately summarizing the meeting <transcript>.
 
         <transcript>
         {transcript}
@@ -38,8 +37,7 @@ class Summarizer:
         Don't hallucinate. Don't make up truthful information.
         """
 
-        completion = bedrock_client.invoke_model(self.model_id, system_prompt="", user_prompt=SUMMARIZATION_PROMPT)
+        completion = bedrock_client.invoke_model(self.model_id, system_prompt="", user_prompt=MEETING_MINUTES_PROMPT)
 
         response_text = completion.get("content")[0]["text"]
         return response_text
-

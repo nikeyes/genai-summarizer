@@ -1,13 +1,11 @@
 from helpers.bedrock_client import BedrockClient
-
+from helpers.config import TMP_FOLDER, MODEL_ID
 
 class QuestionsAndAnswers:
 
     def __init__(self):
-        self.tmp_folder = 'src/_tmp/'
-        self.model_id = "anthropic.claude-3-haiku-20240307-v1:0"
-        # self.model_id = "anthropic.claude-3-sonnet-20240229-v1:0"
-        # self.model_id = "anthropic.claude-3-5-sonnet-20240620-v1:0"
+        self.tmp_folder = TMP_FOLDER
+        self.model_id = MODEL_ID
 
     def ask_things(self, transcription_file: str, summary_language: str, question: str) -> str:
         bedrock_client = BedrockClient()
@@ -15,22 +13,22 @@ class QuestionsAndAnswers:
         with open(transcription_file, "r", encoding="utf-8") as file:
             transcript = file.read()
 
-        SYSTEM_PROMPT = f"""
-        You are responsible for answering questions accurately from the <transcript>.
+        # SYSTEM_PROMPT = f"""
+        # You are responsible for answering questions accurately from the <transcript>.
 
-        <transcript>
-        {transcript}
-        </transcript>
+        # <transcript>
+        # {transcript}
+        # </transcript>
 
-        Answers the following question: 
-        <question>
-        {question}
-        </question>
+        # Answers the following question:
+        # <question>
+        # {question}
+        # </question>
 
-        Write the answer in {summary_language}
+        # Write the answer in {summary_language}
 
-        Don't hallucinate. Don't make up truthful information.
-        """
+        # Don't hallucinate. Don't make up truthful information.
+        # """
         SYSTEM_PROMPT = f"""
         You are an expert research assistant. Here is a document you will answer questions about:
 

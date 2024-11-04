@@ -9,12 +9,13 @@ from groq import Groq
 from pytubefix import YouTube
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api.formatters import TextFormatter
+from helpers.config import TMP_FOLDER
 
 
 class TranscriptionExtractor:
 
     def __init__(self):
-        self.tmp_folder = 'src/_tmp/'
+        self.tmp_folder = TMP_FOLDER
 
     def extract(self, filename: str, context: str, audio_language: str, output_filename: str = None) -> tuple[str, str]:
         file_type = self.__get_file_type(filename)
@@ -45,15 +46,10 @@ class TranscriptionExtractor:
         return output_filename, transcription_text
 
     def __get_transcription_from_audio(self, audio_file, context, audio_language, output_filename) -> str:
-        audio_file_compressed = self.__compress_audio(audio_file)        
+        audio_file_compressed = self.__compress_audio(audio_file)
         print(f"Audio guardado en: {audio_file_compressed}")
         self.__check_audio_file_size(audio_file_compressed)
-        transcription_text = self.__transcript_audio(
-            audio_file_compressed,
-            context,
-            audio_language,
-            output_filename
-        )
+        transcription_text = self.__transcript_audio(audio_file_compressed, context, audio_language, output_filename)
         print(f"Transcripción guardada en: {output_filename}")
         return transcription_text
 
@@ -143,7 +139,7 @@ class TranscriptionExtractor:
 
         return "Otros"
 
-    def get_transcription_file_name(self,url_or_filename):
+    def get_transcription_file_name(self, url_or_filename):
         if self.__get_file_type(url_or_filename) == "YouTube":
             filename = self.__extract_video_id_from_youtube_url(url_or_filename)
         else:
